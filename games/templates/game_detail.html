@@ -1,0 +1,75 @@
+
+{% extends 'base.html' %}
+{% block title %}{{ game.title }}{% endblock %}
+{% block content %}
+<h1>{{ game.h1|default:game.title }}</h1>
+<div class="row">
+  <div class="col-md-8">
+    <div id="game-wrapper" class="my-3">
+      {% if game.game_code %}
+        {{ game.game_code|safe }}
+      {% elif game.game_file %}
+        {% if game.is_flash %}
+          <embed src="{{ game.game_file.url }}" width="100%" height="600" />
+        {% else %}
+          <iframe src="{{ game.game_file.url }}" width="100%" height="600" frameborder="0" allowfullscreen></iframe>
+        {% endif %}
+      {% endif %}
+    </div>
+    <button class="btn btn-outline-secondary mb-3" id="btn-full">Развернуть на весь экран</button>
+    <p><strong>Просмотров:</strong> {{ game.views }} | <strong>Оценка:</strong> <span id="avg">{{ game.average_rating }}</span><span id="avg">{{ game.average_rating }}</span> / 5</p>
+    {% with avg=game.average_rating|floatformat:"0" %}
+    <div class="rating" data-slug="{{ game.slug }}" style="font-size:2em;">
+      {% for i in "12345" %}<span class="star{% if forloop.counter <= avg %} rated{% endif %}" data-value="{{ forloop.counter }}">&#9733;</span>{% endfor %}
+    </div>
+{% endwith %}
+    <div id="msg" class="mt-2 text-success"></div>
+    <div class="mt-3">{{ game.description|safe }}</div>
+  </div>
+  <div class="col-md-4">
+    <h5>Похожие игры</h5>
+    <ul class="list-group">
+      {% for g in related_games %}
+        <li class="list-group-item"><a href="{% url 'game_detail' g.slug %}">{{ g.name }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+
+<style>
+  .star.rated{color:gold;}
+  #game-wrapper.fullscreen{
+    position:fixed;
+    top:0;left:0;
+    width:100%;height:100%;
+    margin:0!important;               /* убираем my-3 Bootstrap */
+    padding:0;
+    background:#000;
+    z-index:1050;
+  }
+  #game-wrapper.fullscreen iframe,
+  #game-wrapper.fullscreen embed{
+    width:100%!important;
+    height:100%!important;
+  }
+  #close-full{
+    position:absolute;
+    top:10px;right:20px;
+    font-size:2rem;
+    color:#fff;
+    cursor:pointer;
+    z-index:1060;
+  }
+</style>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  function setStars(v){document.querySelectorAll('.star').forEach(st=>st.classList.toggle('rated', st.dataset.value<=v));}
+const s=document.querySelectorAll('.star');const m=document.getElementById('msg');const slug=document.querySelector('.rating').dataset.slug;function hi(n){s.forEach(st=>st.style.color=st.dataset.value<=n?'gold':'');}
+s.forEach(st=>{st.addEventListener('mouseover',()=>hi(st.dataset.value));st.addEventListener('mouseout',()=>hi(0));st.addEventListener('click',()=>{fetch(`/game/${slug}/rate/`,{method:'POST',headers:{'X-CSRFToken':'{{ csrf_token }}','Content-Type':'application/x-www-form-urlencoded'},body:'rating='+st.dataset.value}).then(r=>r.json()).then(d=>{if(d.success){m.textContent='Спасибо!';}else{m.textContent='Вы уже голосовали';}});});});
+const btn=document.getElementById('btn-full');const wrap=document.getElementById('game-wrapper');btn.addEventListener('click',()=>{wrap.classList.add('fullscreen');if(!document.getElementById('close-full')){const c=document.createElement('span');c.id='close-full';c.innerHTML='&times;';c.addEventListener('click',()=>{wrap.classList.remove('fullscreen');c.remove();});wrap.appendChild(c);}});
+  setStars(Math.round({{ game.average_rating }}));
+});
+</script>
+{% endblock %}

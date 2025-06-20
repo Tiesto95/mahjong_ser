@@ -1,0 +1,449 @@
+# configuration file /etc/nginx/nginx.conf:
+# For more information on configuration, see:
+#   * Official English Documentation: http://nginx.org/en/docs/
+#   * Official Russian Documentation: http://nginx.org/ru/docs/
+
+user apache;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
+
+# Load dynamic modules. See /usr/share/doc/nginx/README.dynamic.
+include /usr/share/nginx/modules/*.conf;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile            on;
+    tcp_nopush          on;
+    tcp_nodelay         on;
+    keepalive_timeout   65;
+    types_hash_max_size 2048;
+
+    include             /etc/nginx/mime.types;
+    default_type        application/octet-stream;
+
+    # Load modular configuration files from the /etc/nginx/conf.d directory.
+    # See http://nginx.org/en/docs/ngx_core_module.html#include
+    # for more information.
+    include /etc/nginx/conf.d/*.conf;
+	include /etc/nginx/vhosts/*/*.conf;
+
+    server {
+        server_name  localhost;
+        root         /usr/share/nginx/html;
+
+        # Load configuration files for the default server block.
+        include /etc/nginx/default.d/*.conf;
+	include /etc/nginx/vhosts-includes/*.conf;
+
+        location / {
+		try_files /does_not_exists @fallback;
+        }
+
+        error_page 404 /404.html;
+            location = /40x.html {
+		try_files /does_not_exists @fallback;
+        }
+
+        error_page 500 502 503 504 /50x.html;
+            location = /50x.html {
+		try_files /does_not_exists @fallback;
+        }
+	location @fallback {
+		error_log /dev/null crit;
+		proxy_pass http://127.0.0.1:8080;
+		proxy_redirect http://127.0.0.1:8080 /;
+		proxy_set_header Host $host;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+		access_log off ;
+	}
+	disable_symlinks if_not_owner;
+	listen 80;
+	listen [::]:80;
+    }
+
+# Settings for a TLS enabled server.
+#
+#    server {
+#        listen       443 ssl http2 default_server;
+#        listen       [::]:443 ssl http2 default_server;
+#        server_name  localhost;
+#        root         /usr/share/nginx/html;
+#
+#        ssl_certificate "/etc/pki/nginx/server.crt";
+#        ssl_certificate_key "/etc/pki/nginx/private/server.key";
+#        ssl_session_cache shared:SSL:1m;
+#        ssl_session_timeout  10m;
+#        ssl_ciphers PROFILE=SYSTEM;
+#        ssl_prefer_server_ciphers on;
+#
+#        # Load configuration files for the default server block.
+#        include /etc/nginx/default.d/*.conf;
+#
+#        location / {
+#        }
+#
+#        error_page 404 /404.html;
+#            location = /40x.html {
+#        }
+#
+#        error_page 500 502 503 504 /50x.html;
+#            location = /50x.html {
+#        }
+#    }
+
+	client_max_body_size 128m;
+}
+
+
+# configuration file /usr/share/nginx/modules/mod-http-image-filter.conf:
+load_module "/usr/lib64/nginx/modules/ngx_http_image_filter_module.so";
+
+# configuration file /usr/share/nginx/modules/mod-http-perl.conf:
+load_module "/usr/lib64/nginx/modules/ngx_http_perl_module.so";
+
+# configuration file /usr/share/nginx/modules/mod-http-xslt-filter.conf:
+load_module "/usr/lib64/nginx/modules/ngx_http_xslt_filter_module.so";
+
+# configuration file /usr/share/nginx/modules/mod-mail.conf:
+load_module "/usr/lib64/nginx/modules/ngx_mail_module.so";
+
+# configuration file /usr/share/nginx/modules/mod-stream.conf:
+load_module "/usr/lib64/nginx/modules/ngx_stream_module.so";
+
+# configuration file /etc/nginx/mime.types:
+
+types {
+    text/html                                        html htm shtml;
+    text/css                                         css;
+    text/xml                                         xml;
+    image/gif                                        gif;
+    image/jpeg                                       jpeg jpg;
+    application/javascript                           js;
+    application/atom+xml                             atom;
+    application/rss+xml                              rss;
+
+    text/mathml                                      mml;
+    text/plain                                       txt;
+    text/vnd.sun.j2me.app-descriptor                 jad;
+    text/vnd.wap.wml                                 wml;
+    text/x-component                                 htc;
+
+    image/png                                        png;
+    image/svg+xml                                    svg svgz;
+    image/tiff                                       tif tiff;
+    image/vnd.wap.wbmp                               wbmp;
+    image/webp                                       webp;
+    image/x-icon                                     ico;
+    image/x-jng                                      jng;
+    image/x-ms-bmp                                   bmp;
+
+    application/font-woff                            woff;
+    application/java-archive                         jar war ear;
+    application/json                                 json;
+    application/mac-binhex40                         hqx;
+    application/msword                               doc;
+    application/pdf                                  pdf;
+    application/postscript                           ps eps ai;
+    application/rtf                                  rtf;
+    application/vnd.apple.mpegurl                    m3u8;
+    application/vnd.google-earth.kml+xml             kml;
+    application/vnd.google-earth.kmz                 kmz;
+    application/vnd.ms-excel                         xls;
+    application/vnd.ms-fontobject                    eot;
+    application/vnd.ms-powerpoint                    ppt;
+    application/vnd.oasis.opendocument.graphics      odg;
+    application/vnd.oasis.opendocument.presentation  odp;
+    application/vnd.oasis.opendocument.spreadsheet   ods;
+    application/vnd.oasis.opendocument.text          odt;
+    application/vnd.openxmlformats-officedocument.presentationml.presentation
+                                                     pptx;
+    application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+                                                     xlsx;
+    application/vnd.openxmlformats-officedocument.wordprocessingml.document
+                                                     docx;
+    application/vnd.wap.wmlc                         wmlc;
+    application/x-7z-compressed                      7z;
+    application/x-cocoa                              cco;
+    application/x-java-archive-diff                  jardiff;
+    application/x-java-jnlp-file                     jnlp;
+    application/x-makeself                           run;
+    application/x-perl                               pl pm;
+    application/x-pilot                              prc pdb;
+    application/x-rar-compressed                     rar;
+    application/x-redhat-package-manager             rpm;
+    application/x-sea                                sea;
+    application/x-shockwave-flash                    swf;
+    application/x-stuffit                            sit;
+    application/x-tcl                                tcl tk;
+    application/x-x509-ca-cert                       der pem crt;
+    application/x-xpinstall                          xpi;
+    application/xhtml+xml                            xhtml;
+    application/xspf+xml                             xspf;
+    application/zip                                  zip;
+
+    application/octet-stream                         bin exe dll;
+    application/octet-stream                         deb;
+    application/octet-stream                         dmg;
+    application/octet-stream                         iso img;
+    application/octet-stream                         msi msp msm;
+
+    audio/midi                                       mid midi kar;
+    audio/mpeg                                       mp3;
+    audio/ogg                                        ogg;
+    audio/x-m4a                                      m4a;
+    audio/x-realaudio                                ra;
+
+    video/3gpp                                       3gpp 3gp;
+    video/mp2t                                       ts;
+    video/mp4                                        mp4;
+    video/mpeg                                       mpeg mpg;
+    video/quicktime                                  mov;
+    video/webm                                       webm;
+    video/x-flv                                      flv;
+    video/x-m4v                                      m4v;
+    video/x-mng                                      mng;
+    video/x-ms-asf                                   asx asf;
+    video/x-ms-wmv                                   wmv;
+    video/x-msvideo                                  avi;
+}
+
+# configuration file /etc/nginx/conf.d/isplimitreq.conf:
+limit_req_zone $binary_remote_addr zone=all-gamenews.ru:6400k rate=25r/s;
+
+# configuration file /etc/nginx/conf.d/php-fpm.conf:
+# Disabled by ISPmanager
+
+# configuration file /etc/nginx/vhosts/www-root/00-madzhong-online.ru.conf:
+server {
+    listen 46.254.17.117:80;
+    server_name madzhong-online.ru www.madzhong-online.ru;
+
+    location /static/ {
+        alias /srv/django/mahjong/staticfiles/;
+        access_log off;
+        expires 30d;
+    }
+
+    location / {
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_pass http://unix:/run/gunicorn_mahjong_site/gunicorn.sock;
+    }
+}
+# configuration file /etc/nginx/vhosts/www-root/all-gamenews.ru.conf:
+
+server {
+	server_name all-gamenews.ru www.all-gamenews.ru;
+	return 301 https://$host$request_uri;
+	charset off;
+	index index.php index.html;
+	disable_symlinks if_not_owner from=$root_path;
+	include /etc/nginx/vhosts-includes/*.conf;
+	include /etc/nginx/vhosts-resources/all-gamenews.ru/*.conf;
+	access_log /var/www/httpd-logs/all-gamenews.ru.access.log;
+	error_log /var/www/httpd-logs/all-gamenews.ru.error.log notice;
+	ssi on;
+	set $root_path /var/www/www-root/data/www/all-gamenews.ru;
+	root $root_path;
+	gzip on;
+	gzip_comp_level 5;
+	gzip_disable "msie6";
+	gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript;
+	location / {
+		location ~ [^/]\.ph(p\d*|tml)$ {
+			try_files /does_not_exists @fallback;
+		}
+		location ~* ^.+\.(jpg|jpeg|gif|png|svg|js|css|mp3|ogg|mpe?g|avi|zip|gz|bz2?|rar|swf)$ {
+			expires 24h;
+			try_files $uri $uri/ @fallback;
+		}
+		location / {
+			try_files /does_not_exists @fallback;
+		}
+	}
+	location @fallback {
+		proxy_pass http://127.0.0.1:8080;
+		proxy_redirect http://127.0.0.1:8080 /;
+		proxy_set_header Host $host;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+		proxy_set_header X-Forwarded-Port $server_port;
+		access_log off;
+	}
+	listen 46.254.17.117:80;
+}
+server {
+	server_name all-gamenews.ru www.all-gamenews.ru;
+	ssl_certificate "/var/www/httpd-cert/www-root/www.all-gamenews.ru_custom_1.crtca";
+	ssl_certificate_key "/var/www/httpd-cert/www-root/www.all-gamenews.ru_custom_1.key";
+	ssl_ciphers EECDH:+AES256:-3DES:RSA+AES:!NULL:!RC4;
+	ssl_prefer_server_ciphers on;
+	ssl_protocols TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
+	ssl_dhparam /etc/ssl/certs/dhparam4096.pem;
+	charset off;
+	index index.php index.html;
+	disable_symlinks if_not_owner from=$root_path;
+	include /etc/nginx/vhosts-includes/*.conf;
+	include /etc/nginx/vhosts-resources/all-gamenews.ru/*.conf;
+	access_log /var/www/httpd-logs/all-gamenews.ru.access.log;
+	error_log /var/www/httpd-logs/all-gamenews.ru.error.log notice;
+	ssi on;
+	set $root_path /var/www/www-root/data/www/all-gamenews.ru;
+	root $root_path;
+	listen 46.254.17.117:443 ssl;
+	gzip on;
+	gzip_comp_level 5;
+	gzip_disable "msie6";
+	gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript application/javascript;
+	location / {
+		location ~ [^/]\.ph(p\d*|tml)$ {
+			try_files /does_not_exists @fallback;
+		}
+		location ~* ^.+\.(jpg|jpeg|gif|png|svg|js|css|mp3|ogg|mpe?g|avi|zip|gz|bz2?|rar|swf)$ {
+			expires 24h;
+			try_files $uri $uri/ @fallback;
+		}
+		location / {
+			try_files /does_not_exists @fallback;
+		}
+	}
+	location @fallback {
+		proxy_pass http://127.0.0.1:8080;
+		proxy_redirect http://127.0.0.1:8080 /;
+		proxy_set_header Host $host;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+		proxy_set_header X-Forwarded-Port $server_port;
+		access_log off;
+	}
+}
+
+# configuration file /etc/nginx/vhosts-includes/awstats.conf:
+location /awstatsicons/ {
+	alias /usr/share/awstats/wwwroot/icon/;
+}
+
+# configuration file /etc/nginx/vhosts-includes/blacklist-nginx.conf:
+	location @blacklist {
+	proxy_redirect off ;
+	proxy_pass http://unix:/usr/local/mgr5/tmp/ddos.sock;
+		proxy_set_header Host $host;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+		proxy_set_header X_ISP_FIREWALLSEC db2c555486975c0274ad3d6685bf0fc5456cb8c5e1ea1f224e817ae51f9ce1751d96e4b1bfc3dff568b4eaea07e96760b1bcdae311305ec687fd5861e3f634ac30e5e88d2561b96b77d90692d44736536d10446aae4b085373a6edac67eea9a9c558bfcfed23672642d86467f20d07df45bb31d43bb9a454ee1760dc6197ee1f;
+	}
+
+# configuration file /etc/nginx/vhosts-includes/disabled.conf:
+location /disabled/ {
+	alias /usr/local/mgr5/www/disabled/;
+}
+
+# configuration file /etc/nginx/vhosts-includes/letsencrypt.conf:
+location ^~ /.well-known/acme-challenge/ {
+	alias /usr/local/mgr5/www/letsencrypt/;
+}
+# configuration file /etc/nginx/vhosts-includes/phpmyadmin-nginx.conf:
+location /phpmyadmin {
+	alias /usr/share/phpMyAdmin;
+	index index.php;
+}
+location ~* ^/phpmyadmin/(.+\.(jpg|jpeg|gif|css|png|js|ico|html|xml|txt))$ {
+	alias /usr/share/phpMyAdmin/$1;
+	error_page 404 @apache;
+}
+location ~ ^/phpmyadmin/(.+\.php)$ {
+	alias /usr/share/phpMyAdmin/$1;
+	fastcgi_pass unix:/var/run/php-fpm.apache.sock;
+	fastcgi_index index.php;
+	fastcgi_param SCRIPT_FILENAME $request_filename;
+	include fastcgi_params;
+	error_page 502 = @apache;
+	error_page 404 = @apache;
+}
+location @apache {
+	error_log /dev/null crit;
+	proxy_pass http://127.0.0.1:8080;
+	proxy_redirect http://127.0.0.1:8080 /;
+	proxy_set_header Host $host;
+	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header X-Forwarded-Proto $scheme;
+}
+
+location ^~ /phpmyadmin/setup {
+	deny all;
+}
+
+# configuration file /etc/nginx/fastcgi_params:
+
+fastcgi_param  QUERY_STRING       $query_string;
+fastcgi_param  REQUEST_METHOD     $request_method;
+fastcgi_param  CONTENT_TYPE       $content_type;
+fastcgi_param  CONTENT_LENGTH     $content_length;
+
+fastcgi_param  SCRIPT_NAME        $fastcgi_script_name;
+fastcgi_param  REQUEST_URI        $request_uri;
+fastcgi_param  DOCUMENT_URI       $document_uri;
+fastcgi_param  DOCUMENT_ROOT      $document_root;
+fastcgi_param  SERVER_PROTOCOL    $server_protocol;
+fastcgi_param  REQUEST_SCHEME     $scheme;
+fastcgi_param  HTTPS              $https if_not_empty;
+
+fastcgi_param  GATEWAY_INTERFACE  CGI/1.1;
+fastcgi_param  SERVER_SOFTWARE    nginx/$nginx_version;
+
+fastcgi_param  REMOTE_ADDR        $remote_addr;
+fastcgi_param  REMOTE_PORT        $remote_port;
+fastcgi_param  SERVER_ADDR        $server_addr;
+fastcgi_param  SERVER_PORT        $server_port;
+fastcgi_param  SERVER_NAME        $server_name;
+
+# PHP only, required if PHP was built with --enable-force-cgi-redirect
+fastcgi_param  REDIRECT_STATUS    200;
+fastcgi_param  SCRIPT_FILENAME    $request_filename;
+
+# configuration file /etc/nginx/vhosts-includes/roundcube.conf:
+# Created by ispmanager 10.10.2024
+# Please do not change this comment
+# or all your changes will be overwritten
+# the next time you update this package.
+location /roundcube {
+	alias /usr/share/roundcubemail;
+	index index.php;
+}
+location ~ ^/roundcube/(.+\.php)$ {
+	alias /usr/share/roundcubemail/$1;
+	fastcgi_pass unix:/var/run/php-fpm74.roundcube.sock;
+	fastcgi_index index.php;
+	fastcgi_param SCRIPT_FILENAME $request_filename;
+	fastcgi_param PHP_FLAG "display_errors=on \n display_startup_errors=on";
+	fastcgi_param PHP_VALUE "error_reporting=30711";
+	include fastcgi_params;
+	fastcgi_param REQUEST_URI $http_x_forwarded_path if_not_empty;
+}
+
+# configuration file /etc/nginx/vhosts-resources/all-gamenews.ru/reqlimit.conf:
+limit_req zone=all-gamenews.ru burst=100;
+error_page 503 =429 @blacklist;
+
+# configuration file /etc/nginx/default.d/php.conf:
+# Disabled by ISPmanager
+
+# configuration file /etc/nginx/default.d/phpMyAdmin.conf:
+# Disabled by ISPmanager
+
+# configuration file /etc/nginx/default.d/roundcubemail.conf:
+# Disabled by ISPmanager
+
