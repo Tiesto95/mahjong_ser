@@ -1,8 +1,241 @@
+:root {
+  --clr-bg: #f8e6ce;
+  --clr-teal: #0a6a67;       /* основная бирюза */
+  --clr-teal-dark: #0f766e;  /* чуть темнее — навбар/тайлы */
+  --clr-brand: #9d2420;      /* фирменный бордовый / акцент */
+  --clr-light: #eeebeb;      /* светлый текст */
+  --clr-gold: #ffc107;       /* рейтинг‑звёзды */
+}
 
-body{background:#f4f4f4;}
-.card-title a{text-decoration:none;}
-#game-wrapper.fullscreen{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:1050;padding:0;}
-#game-wrapper.fullscreen iframe,#game-wrapper.fullscreen embed{width:100%!important;height:100%!important;}
-#close-full{position:absolute;top:10px;right:20px;font-size:2rem;color:#fff;cursor:pointer;z-index:1060;}
+/* ───────── Base ───────── */
+body { background: var(--clr-bg); }
 
-.star.rated{color:gold;}
+/* ссылки */
+a,
+a:visited { color: var(--clr-teal); }
+a:hover   { color: var(--clr-brand); }
+
+strong { font-weight: 500; }
+
+h1, h2, h3 { color: var(--clr-brand); }
+h1 { font-size: 21pt; }
+h2 { font-size: 17pt; }
+h3 { font-size: 14pt; }
+
+p { text-align: justify; }
+
+.logo img { margin-bottom: 10px; }
+
+/* ───────── Навигация категорий ───────── */
+.cat_menu {
+  background: var(--clr-teal);
+  margin: 0 auto;
+  padding: 5px 5px 20px;  /* shorthand вместо двух свойств */
+}
+.cat_menu a img {
+  width: 120px;
+  height: 110px;
+  margin: 10px 25px 10px 10px; /* top right bottom left */
+  border-radius: 10%;
+}
+
+/* ───────── Плитка‑ссылка ───────── */
+.tile,
+.card {
+  transition: transform .22s ease,
+              box-shadow .22s ease,
+              filter .22s ease;
+  will-change: transform, box-shadow, filter;
+  margin-right: 10px;
+}
+
+.tile {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+}
+.tile img {
+  display: block;
+  height: auto;
+  margin-bottom: 2px;
+}
+.tile .caption {
+  font-size: 18px;
+  font-weight: 500;
+  color: #e0e0e0;
+}
+
+/* tile inside category bar */
+.cat_menu .tile {
+  text-align: center;
+  padding: .75rem .5rem;
+  border-radius: 1.25rem;
+  background: var(--clr-teal-dark);
+  color: #fff;
+}
+.cat_menu .tile:hover,
+.cat_menu .tile:focus-visible {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 10px 18px rgba(0,0,0,.18);
+  filter: brightness(1.08);
+}
+
+/* ───────── Карточки игр ───────── */
+.card {
+  border: none;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+}
+.card:hover,
+.card:focus-within {
+  transform: translateY(-6px) scale(1.04);
+  box-shadow: 0 14px 30px rgba(0,0,0,.20);
+  filter: brightness(1.02);
+}
+.card-img-top {
+  height: 10.5rem;
+  object-fit: cover;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile,
+  .card { transition: none; }
+}
+
+/* ───────── Подвал ───────── */
+.fot_style {
+  background: var(--clr-teal);
+  margin: 20px auto 0;
+  padding: 10px;
+  color: var(--clr-light);
+}
+
+/* ───────── Игровое поле ───────── */
+#game-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  background: #111;
+  box-shadow: 0 18px 40px rgba(0,0,0,.25);
+}
+#game-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2px;                /* толщина рамки */
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(135deg,#18c5b0 0%,#ff8e4d 50%,#ff568a 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity: .45;
+  filter: blur(4px);
+  transition: opacity .3s;
+}
+#game-wrapper:hover::after { opacity: .9; }
+
+/* полноэкранный режим */
+#game-wrapper.fullscreen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  padding: 0;
+  background: #000;
+  z-index: 1050;
+}
+#game-wrapper.fullscreen iframe,
+#game-wrapper.fullscreen embed {
+  width: 100% !important;
+  height: 100% !important;
+}
+#close-full {
+  position: absolute;
+  top: 10px; right: 20px;
+  z-index: 1060;
+  font-size: 2rem;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* ───────── Кнопки‑пилюли ───────── */
+.btn-pill {
+  border-radius: 9999px !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .2px;
+  box-shadow: 0 4px 10px rgba(0,0,0,.15);
+}
+
+/* ───────── Похожие игры ───────── */
+.sim-card {
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,.12);
+  transition: transform .2s, box-shadow .2s;
+}
+.sim-card:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 12px 28px rgba(0,0,0,.22);
+}
+.sim-card .caption {
+  background: #fff;
+  padding: .4rem .6rem;
+  font-size: .8rem;
+  line-height: 1.2;
+}
+
+/* ───────── Звёзды рейтинга ───────── */
+.star {
+  cursor: pointer;
+  font-size: 1.4rem;
+  transition: color .2s, transform .15s;
+}
+.star:hover,
+.star.rated { color: var(--clr-gold); }
+.star:hover { transform: scale(1.25) rotate(-8deg); }
+
+/* ───────── Сетка игр ───────── */
+.col { max-width: 300px; max-height: 300px; }
+
+.game-card { width: 90%; margin: 0 auto; }
+
+a.card-title { text-decoration: none; }
+
+.game-image {
+  width: 100%;
+  height: 182px;              /* 260 px ×0.7 */
+  object-fit: cover;
+}
+
+.game-badge {
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translate(-50%, 50%);
+  z-index: 2;
+  padding: 3px 10px;
+  border-radius: 14px;
+  font-size: .68rem;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.HTML5 { background: #0d6efd; }
+.Flash { background: var(--clr-brand); }
+
+.card-body-ov { padding-top: 1.8rem; }
+
+
+.btn-teal{--bs-btn-bg:#0f766e;--bs-btn-border-color:#0f766e;--bs-btn-hover-bg:#0d6e66;--bs-btn-hover-border-color:#0d6e66;--bs-btn-active-bg:#0b5f58;--bs-btn-active-border-color:#0b5f58;color:#fff;}
+.btn-pill{border-radius:9999px!important;font-weight:600;text-transform:uppercase;letter-spacing:.2px;box-shadow:0 4px 10px rgba(0,0,0,.15);} 
+.btn-social{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:#0f766e;color:#fff;font-size:1.05rem;transition:background .2s;} .btn-social:hover{background:#0d6e66;}
+#game-wrapper{border-radius:1.5rem;box-shadow:0 18px 40px rgba(0,0,0,.25);overflow:hidden;position:relative;background:#111;}
+#game-wrapper::after{content:'';position:absolute;inset:0;pointer-events:none;border-radius:inherit;padding:2px;background:linear-gradient(135deg,#18c5b0 0%,#ff8e4d 50%,#ff568a 100%);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.45;filter:blur(4px);transition:opacity .3s;}#game-wrapper:hover::after{opacity:.9;}
+.sim-card{border-radius:1rem;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.12);transition:transform .2s,box-shadow .2s;}
+.sim-card:hover{transform:translateY(-4px) scale(1.03);box-shadow:0 12px 28px rgba(0,0,0,.22);} 
+.sim-card .caption{background:#fff;padding:.4rem .6rem;font-size:.8rem;line-height:1.2;}
+.star{cursor:pointer;font-size:2rem;transition:color .2s,transform .15s;}
+.star:hover{transform:scale(1.25) rotate(-8deg);} 
+.star.rated,.star:hover{color:#ffc107;}

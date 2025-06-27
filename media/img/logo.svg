@@ -1,0 +1,41 @@
+<!-- logo_tiles_red.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 430 80" height="70">
+  <defs>
+    <style>
+      .tile   { fill:#f9f2e4; stroke:#005F56; stroke-width:4 }
+      .letter { fill:#9d2420; font-family:"Montserrat",sans-serif; font-weight:700 }
+    </style>
+    <filter id="ds" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity=".15"></feDropShadow>
+    </filter>
+  </defs>
+
+  <!-- Плитки и буквы -->
+  <!-- М -->
+  <rect x="10" y="5" width="50" height="70" rx="6" class="tile" filter="url(#ds)"></rect>
+  <text x="35" y="55" text-anchor="middle" font-size="46" class="letter">М</text>
+
+  <!-- А -->
+  <rect x="66" y="5" width="50" height="70" rx="6" class="tile" filter="url(#ds)"></rect>
+  <text x="91" y="55" text-anchor="middle" font-size="46" class="letter">А</text>
+
+  <!-- Д -->
+  <rect x="122" y="5" width="50" height="70" rx="6" class="tile" filter="url(#ds)"></rect>
+  <text x="147" y="55" text-anchor="middle" font-size="46" class="letter">Д</text>
+
+  <!-- Ж -->
+  <rect x="178" y="5" width="50" height="70" rx="6" class="tile" filter="url(#ds)"></rect>
+  <text x="203" y="55" text-anchor="middle" font-size="46" class="letter">Ж</text>
+
+  <!-- О -->
+  <rect x="234" y="5" width="50" height="70" rx="6" class="tile" filter="url(#ds)"></rect>
+  <text x="259" y="55" text-anchor="middle" font-size="46" class="letter">О</text>
+
+  <!-- Н -->
+  <rect x="290" y="5" width="50" height="70" rx="6" class="tile" filter="url(#ds)"></rect>
+  <text x="315" y="55" text-anchor="middle" font-size="46" class="letter">Н</text>
+
+  <!-- Г -->
+  <rect x="346" y="5" width="50" height="70" rx="6" class="tile" filter="url(#ds)"></rect>
+  <text x="371" y="55" text-anchor="middle" font-size="46" class="letter">Г</text>
+</svg>

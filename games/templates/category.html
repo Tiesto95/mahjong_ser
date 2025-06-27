@@ -1,20 +1,35 @@
 
 {% extends 'base.html' %}
+{% block title %}{{ category.title }}{% endblock %}
+{% block description %}{{ category.description }}{% endblock %}
 {% block content %}
-<h1>{{ category.name }}</h1>
+<h1>{{ category.h1 }}</h1>
+
 <div class="row row-cols-1 row-cols-md-3 g-4">
 {% for game in games %}
-  <div class="col">
-    <a href="{% url 'game_detail' game.slug %}" class="text-decoration-none text-dark">
-      <div class="card h-100">
-        {% if game.image %}<img src="{{ game.image.url }}" class="card-img-top" alt="{{ game.name }}">{% endif %}
-        <div class="card-body text-center">
-          <h5 class="card-title">{{ game.name }}</h5>
-          <p>⭐ {{ game.average_rating }} / 5</p>
+<div class="col">
+  <a href="{% url 'game_detail' game.slug %}" class="text-decoration-none text-dark">
+    <div class="card h-100 shadow-sm overflow-hidden game-card">
+      <div class="position-relative">
+        {% if game.image %}<img src="{{ game.image.url }}" class="game-image" alt="{{ game.name }}">{% endif %}
+        <span class="game-badge {{ game.type_game }}">{{ game.type_game }}</span>
+      </div>
+      <div class="card-body text-center card-body-ov">
+        <h5 class="card-title mb-2">{{ game.name }}<</h5>
+        <div class="text-warning small">
+                <span class="ms-1 text-muted">⭐ {{ game.average_rating|floatformat }} / 5</span>
         </div>
       </div>
-    </a>
-  </div>
-{% endfor %}
+    </div>
+  </a>
 </div>
+
+
+{% endfor %}
+
+</div>
+<article class="bg-white rounded-3 p-4 shadow-sm mt-4">
+  {{ category.text|safe }}
+</article>
+
 {% endblock %}
